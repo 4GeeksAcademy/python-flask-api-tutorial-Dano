@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Lista inicial como diccionarios con id
 todos = [
     {"id": 1, "todo": "cocinar"},
     {"id": 2, "todo": "comer"},
@@ -10,22 +9,22 @@ todos = [
     {"id": 4, "todo": "limpiar"}
 ]
 
-# GET → obtener todos los ToDos
+# GET → obtener todos
 @app.route('/todos', methods=['GET'])
 def get_todos():
     if not todos:
         return jsonify({"msg": "No hay ToDos disponibles"}), 200
     return jsonify({"data": todos}), 200
 
-# POST → agregar un nuevo ToDo
+# POST → agregar todo
 @app.route('/todos', methods=['POST'])
 def add_todo():
-    body = request.get_json()  # sin silent=True
+    body = request.get_json(silent=True)
     if body is None or 'todo' not in body:
         return jsonify({"msg": "El campo 'todo' es obligatorio"}), 400
 
     new_todo = {
-        "id": len(todos) + 1,     # ojo: si borras, los ids pueden reutilizarse
+        "id": len(todos) + 1,  
         "todo": body['todo']
     }
     todos.append(new_todo)
@@ -33,11 +32,11 @@ def add_todo():
     print(body)
     return jsonify({"msg": "ToDo agregado exitosamente!", "data": new_todo}), 200
 
-# DELETE → eliminar un ToDo por id
+# DELETE id
 @app.route('/todos/<int:todo_id>', methods=['DELETE'])
 def delete_todo(todo_id):
     global todos
-    todo = next((t for t in todos if t["id"] == todo_id), None)
+    todo = next((todo for todo in todos if todo["id"] == todo_id), None)
     if todo is None:
         return jsonify({"msg": "No se encontró el ToDo con id {}".format(todo_id)}), 404
 
